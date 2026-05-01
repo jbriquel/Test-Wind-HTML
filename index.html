@@ -4,14 +4,12 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>UMN Wind Tunnel Calculator</title>
-<!-- Title-->
-<!-- __________________ -->
 <style>
 :root {
---maroon: #6b0117;
---gold: #cc9d0f;
---dark-gray: #292929;
---light-gray: #c7c7c7;
+--maroon: #900021;
+--gold: #ffcc33;
+--dark-gray: #333333;
+--light-gray: #d5d6d2;
 --border-radius: 6px;
 }
 html, body {
@@ -21,9 +19,9 @@ padding: 0;
 overflow-x: hidden;
 }
 body {
-font-family: Times New Roman, Georgia, Geneva, Verdana, sans-serif;
+/* font-family: Times New Roman, Georgia, Geneva, Verdana, sans-serif; */
 background-color: transparent;
-color: var(dark-gray);
+color: var(--dark-gray);
 }
 .container {
 background-color: white;
@@ -86,6 +84,11 @@ transition: background-color 0.2s, font-weight 0.2s;
 font-size: 0.85rem;
 user-select: none;
 white-space: nowrap;
+/* Added minimal overrides so standard <button> tags fit your CSS visually */
+border: none;
+background: transparent;
+font-family: inherit;
+color: inherit;
 }
 
 /* selecting toggle option */
@@ -142,7 +145,7 @@ border-color: var(--maroon);
 .unit-suffix {
 position: absolute;
 right: 12px;
-color: #888;
+color: #5a5a5a;
 font-weight: 600;
 pointer-events: none;
 background-color: transparent;
@@ -196,7 +199,7 @@ margin-top: 5px;
 }
 
 .btn-calc:hover {
-background-color: #5b0013;
+background-color: #a10021;
 }
 
 /* RESULTS */
@@ -214,7 +217,7 @@ animation: fadeIn 0.3s ease-in-out;
 margin: 0 0 5px 0;
 font-size: 0.85rem;
 text-transform: uppercase;
-color: #888;
+color: #5a5a5a;
 }
 
 #resultValue {
@@ -261,48 +264,38 @@ display: none !important;
 </head>
 <body>
 
-
 <div class="container">
 <div class="content">
-<!-- top: tunnel and mode -->
 <div class="row-group">
-<!-- Picking tunnel option for mode -->
 <div class="form-group">
-<label class="form-label">Tunnel</label>
-<div class="toggle-container" id="tunnelSelect">
-<!-- CR on left , BD on right -->
-<div class="toggle-option active" onclick="setTunnel('Closed Return', this)">Closed Return</div>
-<div class="toggle-option" onclick="setTunnel('Blow Down', this)">Blow Down</div>
+<div class="form-label" id="tunnelGroupLabel">Tunnel</div>
+<div class="toggle-container" id="tunnelSelect" role="group" aria-labelledby="tunnelGroupLabel">
+<button type="button" class="toggle-option active" aria-pressed="true" onclick="setTunnel('Closed Return', this)">Closed Return</button>
+<button type="button" class="toggle-option" aria-pressed="false" onclick="setTunnel('Blow Down', this)">Blow Down</button>
 </div>
 </div>
 
-<!-- selection -->
 <div class="form-group">
-<label class="form-label">Mode</label>
-<div class="toggle-container" id="modeSelect">
-<!-- flipped order: find freq on left, find speed on right -->
-<div class="toggle-option active" onclick="setMode('f', this)">Find Frequency</div>
-<div class="toggle-option" onclick="setMode('s', this)">Find Speed</div>
+<div class="form-label" id="modeGroupLabel">Mode</div>
+<div class="toggle-container" id="modeSelect" role="group" aria-labelledby="modeGroupLabel">
+<button type="button" class="toggle-option active" aria-pressed="true" onclick="setMode('f', this)">Find Frequency</button>
+<button type="button" class="toggle-option" aria-pressed="false" onclick="setMode('s', this)">Find Speed</button>
 </div>
 </div>
 </div>
 
-<!-- dynamic input area -->
 <div class="form-group">
-<label class="form-label" id="inputLabel">Enter the Airspeed</label>
+<label class="form-label" id="inputLabel" for="mainInput">Enter the Airspeed</label>
 
 <div class="calc-row">
-<!-- input -->
 <div class="input-wrapper">
 <input type="number" id="mainInput" step="0.01" placeholder="0.00">
-<span id="hzLabel" class="unit-suffix hidden">Hz</span>
+<span id="hzLabel" class="unit-suffix hidden" aria-hidden="true">Hz</span>
 </div>
 
-<!-- speed mode -->
-<div id="arrowIcon" class="arrow-icon">&#8594;</div>
+<div id="arrowIcon" class="arrow-icon" aria-hidden="true">&#8594;</div>
 
-<!-- choosing units -->
-<select id="unitSelect" class="unit-select">
+<select id="unitSelect" class="unit-select" aria-label="Select Unit of Measurement">
 <option value="mph">mph</option>
 <option value="m/s">m/s</option>
 <option value="kph">kph</option>
@@ -310,10 +303,9 @@ display: none !important;
 </div>
 </div>
 
-<button class="btn-calc" onclick="calculate()">Calculate</button>
+<button type="button" class="btn-calc" onclick="calculate()">Calculate</button>
 
-<!-- showcasing results -->
-<div id="resultContainer">
+<div id="resultContainer" aria-live="polite" aria-atomic="true">
 <h3 id="resultLabel">Result</h3>
 <div id="resultValue">--</div>
 </div>
@@ -346,34 +338,46 @@ updateUIForMode();
 function updateToggleVisuals(parentId, activeElement) {
 const parent = document.getElementById(parentId);
 const options = parent.querySelectorAll('.toggle-option');
-options.forEach(opt => opt.classList.remove('active'));
+options.forEach(opt => {
+    opt.classList.remove('active');
+    opt.setAttribute('aria-pressed', 'false'); // Accessibility State
+});
 activeElement.classList.add('active');
+activeElement.setAttribute('aria-pressed', 'true'); // Accessibility State
 }
 
 function updateUIForMode() {
-const inputLabel = document.getElementById('inputLabel');
-const hzLabel = document.getElementById('hzLabel');
-const arrowIcon = document.getElementById('arrowIcon');
-const resultContainer = document.getElementById('resultContainer');
-const resultLabel = document.getElementById('resultLabel');
+    const inputLabel = document.getElementById('inputLabel');
+    const hzLabel = document.getElementById('hzLabel');
+    const arrowIcon = document.getElementById('arrowIcon');
+    const resultContainer = document.getElementById('resultContainer');
+    const resultLabel = document.getElementById('resultLabel');
+    const unitSelect = document.getElementById('unitSelect'); // Grab the dropdown
 
-// clearing previous results and input
-resultContainer.style.display = 'none';
-document.getElementById('mainInput').value = '';
+    // clearing previous results and input
+    resultContainer.style.display = 'none';
+    document.getElementById('mainInput').value = '';
 
-if (currentMode === 's') {
-// mode: find airspeed nput
-inputLabel.textContent = "Enter Frequency";
-hzLabel.classList.remove('hidden');
-arrowIcon.style.display = 'block';
-resultLabel.textContent = "Calculated Airspeed";
-} else {
-// mode: find frequency
-inputLabel.textContent = "Enter Airspeed";
-hzLabel.classList.add('hidden');
-arrowIcon.style.display = 'none';
-resultLabel.textContent = "Calculated Frequency";
-}
+    if (currentMode === 's') {
+        // MODE: FIND AIRSPEED
+        // 1. Explicitly state Hz in the visible label
+        inputLabel.textContent = "Enter Frequency (in Hz)"; 
+        hzLabel.classList.remove('hidden');
+        arrowIcon.style.display = 'block';
+        resultLabel.textContent = "Calculated Airspeed";
+        
+        // 2. Dynamically update the dropdown's hidden label for screen readers
+        unitSelect.setAttribute('aria-label', 'Select unit to convert calculated airspeed into');
+    } else {
+        // MODE: FIND FREQUENCY
+        inputLabel.textContent = "Enter Airspeed"; 
+        hzLabel.classList.add('hidden');
+        arrowIcon.style.display = 'none';
+        resultLabel.textContent = "Calculated Frequency";
+        
+        // 3. Dynamically update the dropdown's hidden label for screen readers
+        unitSelect.setAttribute('aria-label', 'Select unit for the airspeed you are entering');
+    }
 }
 
 function calculate() {
