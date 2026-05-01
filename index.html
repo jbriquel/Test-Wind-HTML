@@ -1,0 +1,425 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>UMN Wind Tunnel Calculator</title>
+<!-- Title-->
+<!-- __________________ -->
+<style>
+:root {
+--maroon: #6b0117;
+--gold: #cc9d0f;
+--dark-gray: #292929;
+--light-gray: #c7c7c7;
+--border-radius: 6px;
+}
+html, body {
+/* getting ride of unwanted spacing */
+margin: 0;
+padding: 0;
+overflow-x: hidden;
+}
+body {
+font-family: Times New Roman, Georgia, Geneva, Verdana, sans-serif;
+background-color: transparent;
+color: var(dark-gray);
+}
+.container {
+background-color: white;
+width: 100%;
+max-width: 600px;
+border-radius: var(--border-radius);
+box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+overflow: hidden;
+border-top: 8px solid var(--maroon);
+margin: 0 auto;
+box-sizing: border-box;
+}
+
+.content {
+padding: 20px; /* inner padding, text elements aren't against the edgees (neatness) */
+}
+
+/* Layout Utilities */
+.row-group {
+display: flex;
+gap: 15px;
+margin-bottom: 20px;
+/* adding space near the row */
+}
+
+.form-group {
+margin-bottom: 20px;
+flex: 1;
+}
+
+.row-group .form-group {
+margin-bottom: 0;
+}
+
+.form-label {
+display: block;
+margin-bottom: 8px;
+font-weight: 600;
+font-size: 0.9rem;
+color: var(--maroon);
+text-transform: uppercase;
+letter-spacing: 0.5px;
+}
+
+/* segment controls */
+.toggle-container {
+display: flex;
+background-color: #e9e9e9;
+border-radius: var(--border-radius);
+padding: 4px;
+}
+
+.toggle-option {
+flex: 1;
+text-align: center;
+cursor: pointer;
+padding: 8px 5px;
+border-radius: 4px;
+transition: background-color 0.2s, font-weight 0.2s;
+font-size: 0.85rem;
+user-select: none;
+white-space: nowrap;
+}
+
+/* selecting toggle option */
+.toggle-option.active {
+background-color: white;
+color: var(--maroon);
+font-weight: bold;
+box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+/* row layout for calculation input area */
+.calc-row {
+display: flex;
+align-items: center;
+gap: 10px;
+}
+
+/* holding input in Hz */
+.input-wrapper {
+position: relative;
+flex: 2;
+display: flex;
+align-items: center;
+min-width: 0;
+}
+
+.input-wrapper input {
+width: 100%;
+padding: 12px 15px;
+padding-right: 40px; /* extra space for overlapping */
+font-size: 1.1rem;
+border: 1px solid #ccc;
+border-radius: var(--border-radius);
+outline: none;
+box-sizing: border-box;
+appearance: none; /* removing default styling */
+}
+
+.input-wrapper input[type=number]::-webkit-inner-spin-button,
+.input-wrapper input[type=number]::-webkit-outer-spin-button {
+-webkit-appearance: none;
+margin: 0;
+}
+.input-wrapper input[type=number] {
+-moz-appearance: textfield;
+}
+
+.input-wrapper input:focus {
+border-color: var(--maroon);
+}
+
+
+/* hz label that appears next to input */
+.unit-suffix {
+position: absolute;
+right: 12px;
+color: #888;
+font-weight: 600;
+pointer-events: none;
+background-color: transparent;
+z-index: 5; /* ensuring on top */
+}
+
+.arrow-icon {
+color: var(--maroon);
+font-size: 1.5rem;
+font-weight: bold;
+display: none;
+flex-shrink: 0;
+}
+
+/* dropdown box in website */
+.unit-select {
+flex: 1;
+padding: 12px 10px;
+background-color: #f9f9f9;
+border: 1px solid #ccc;
+border-radius: var(--border-radius);
+font-size: 1rem;
+cursor: pointer;
+outline: none;
+font-weight: 600;
+color: var(--dark-gray);
+min-width: 80px;
+box-sizing: border-box;
+}
+
+.unit-select:focus {
+border-color: var(--maroon);
+background-color: #fff;
+}
+
+/* calculate button */
+.btn-calc {
+width: 100%;
+padding: 14px;
+background-color: var(--maroon);
+color: white;
+border: none;
+border-radius: var(--border-radius);
+font-size: 1rem;
+font-weight: bold;
+cursor: pointer;
+transition: background-color 0.2s;
+text-transform: uppercase;
+letter-spacing: 0.5px;
+margin-top: 5px;
+}
+
+.btn-calc:hover {
+background-color: #5b0013;
+}
+
+/* RESULTS */
+#resultContainer {
+margin-top: 20px;
+padding: 15px;
+background-color: #fff8e1;
+border-left: 5px solid var(--gold);
+border-radius: 4px;
+display: none;
+animation: fadeIn 0.3s ease-in-out;
+}
+
+#resultLabel {
+margin: 0 0 5px 0;
+font-size: 0.85rem;
+text-transform: uppercase;
+color: #888;
+}
+
+#resultValue {
+font-size: 1.5rem;
+font-weight: bold;
+color: var(--maroon);
+word-break: break-all;
+}
+
+@keyframes fadeIn {
+from { opacity: 0; transform: translateY(5px); }
+to { opacity: 1; transform: translateY(0); }
+}
+
+.hidden { display: none !important; }
+
+/* adjustments */
+@media (max-width: 480px) {
+.content {
+padding: 15px;
+}
+
+/* stacking the row group on very small screens */
+.row-group {
+flex-direction: column;
+gap: 15px;
+margin-bottom: 15px;
+}
+
+.calc-row {
+flex-wrap: wrap;
+}
+
+/* makinh inputs full width on mobile */
+.input-wrapper, .unit-select {
+flex: 1 1 100%;
+}
+
+.arrow-icon {
+display: none !important;
+}
+}
+</style>
+</head>
+<body>
+
+
+<div class="container">
+<div class="content">
+<!-- top: tunnel and mode -->
+<div class="row-group">
+<!-- Picking tunnel option for mode -->
+<div class="form-group">
+<label class="form-label">Tunnel</label>
+<div class="toggle-container" id="tunnelSelect">
+<!-- CR on left , BD on right -->
+<div class="toggle-option active" onclick="setTunnel('Closed Return', this)">Closed Return</div>
+<div class="toggle-option" onclick="setTunnel('Blow Down', this)">Blow Down</div>
+</div>
+</div>
+
+<!-- selection -->
+<div class="form-group">
+<label class="form-label">Mode</label>
+<div class="toggle-container" id="modeSelect">
+<!-- flipped order: find freq on left, find speed on right -->
+<div class="toggle-option active" onclick="setMode('f', this)">Find Frequency</div>
+<div class="toggle-option" onclick="setMode('s', this)">Find Speed</div>
+</div>
+</div>
+</div>
+
+<!-- dynamic input area -->
+<div class="form-group">
+<label class="form-label" id="inputLabel">Enter the Airspeed</label>
+
+<div class="calc-row">
+<!-- input -->
+<div class="input-wrapper">
+<input type="number" id="mainInput" step="0.01" placeholder="0.00">
+<span id="hzLabel" class="unit-suffix hidden">Hz</span>
+</div>
+
+<!-- speed mode -->
+<div id="arrowIcon" class="arrow-icon">&#8594;</div>
+
+<!-- choosing units -->
+<select id="unitSelect" class="unit-select">
+<option value="mph">mph</option>
+<option value="m/s">m/s</option>
+<option value="kph">kph</option>
+</select>
+</div>
+</div>
+
+<button class="btn-calc" onclick="calculate()">Calculate</button>
+
+<!-- showcasing results -->
+<div id="resultContainer">
+<h3 id="resultLabel">Result</h3>
+<div id="resultValue">--</div>
+</div>
+</div>
+</div>
+
+<script>
+// defaults: tunnel=CR, mode=Find Freq)
+let currentTunnel = 'Closed Return';
+let currentMode = 'f';
+
+// constants
+const UNIT_CONVERSIONS = {
+"mph": 2.2369,
+"kph": 3.6,
+"m/s": 1.0
+};
+
+function setTunnel(tunnel, element) {
+currentTunnel = tunnel;
+updateToggleVisuals('tunnelSelect', element);
+}
+
+function setMode(mode, element) {
+currentMode = mode;
+updateToggleVisuals('modeSelect', element);
+updateUIForMode();
+}
+
+function updateToggleVisuals(parentId, activeElement) {
+const parent = document.getElementById(parentId);
+const options = parent.querySelectorAll('.toggle-option');
+options.forEach(opt => opt.classList.remove('active'));
+activeElement.classList.add('active');
+}
+
+function updateUIForMode() {
+const inputLabel = document.getElementById('inputLabel');
+const hzLabel = document.getElementById('hzLabel');
+const arrowIcon = document.getElementById('arrowIcon');
+const resultContainer = document.getElementById('resultContainer');
+const resultLabel = document.getElementById('resultLabel');
+
+// clearing previous results and input
+resultContainer.style.display = 'none';
+document.getElementById('mainInput').value = '';
+
+if (currentMode === 's') {
+// mode: find airspeed nput
+inputLabel.textContent = "Enter Frequency";
+hzLabel.classList.remove('hidden');
+arrowIcon.style.display = 'block';
+resultLabel.textContent = "Calculated Airspeed";
+} else {
+// mode: find frequency
+inputLabel.textContent = "Enter Airspeed";
+hzLabel.classList.add('hidden');
+arrowIcon.style.display = 'none';
+resultLabel.textContent = "Calculated Frequency";
+}
+}
+
+function calculate() {
+const val = parseFloat(document.getElementById('mainInput').value);
+const isBDTunnel = (currentTunnel === "Blow Down");
+const resultContainer = document.getElementById('resultContainer');
+const resultText = document.getElementById('resultValue');
+const unit = document.getElementById('unitSelect').value;
+const conversionValue = UNIT_CONVERSIONS[unit];
+
+if (isNaN(val)) {
+alert("Please enter a valid number.");
+return;
+}
+
+if (currentMode === 's') {
+// find the speed (input is Hz)
+// (slope * hz + intercept) * conversion
+let airspeed;
+if (isBDTunnel) {
+airspeed = (0.744 * val - 3.27) * conversionValue;
+} else {
+airspeed = (0.501 * val - 2.92) * conversionValue;
+}
+
+if (airspeed < 0) airspeed = 0;
+resultText.textContent = `${airspeed.toFixed(2)} ${unit}`;
+
+} else {
+// find the frequency when the input is speed
+// ((speed / conversion) + intercept) / slope
+let hertz;
+if (isBDTunnel) {
+hertz = (val / conversionValue + 3.27) / 0.744;
+} else {
+hertz = (val / conversionValue + 2.92) / 0.501;
+}
+
+if (hertz < 0) hertz = 0;
+resultText.textContent = `${hertz.toFixed(1)} Hz`;
+}
+
+resultContainer.style.display = 'block';
+}
+
+updateUIForMode();
+</script>
+</body>
+</html>
