@@ -19,7 +19,7 @@ padding: 0;
 overflow-x: hidden;
 }
 body {
-/* font-family: Times New Roman, Georgia, Geneva, Verdana, sans-serif; */
+font-family: Times New Roman, Georgia, Geneva, Verdana, sans-serif;
 background-color: transparent;
 color: var(--dark-gray);
 }
@@ -31,7 +31,7 @@ border-radius: var(--border-radius);
 box-shadow: 0 4px 15px rgba(0,0,0,0.1);
 overflow: hidden;
 border-top: 8px solid var(--maroon);
-margin: 1.5em auto;
+margin: 0 auto;
 box-sizing: border-box;
 }
 
@@ -84,7 +84,7 @@ transition: background-color 0.2s, font-weight 0.2s;
 font-size: 0.85rem;
 user-select: none;
 white-space: nowrap;
-/* Added minimal overrides so standard <button> tags fit your CSS visually */
+/* Added minimal overrides so standard <button> tags fit the CSS visually */
 border: none;
 background: transparent;
 font-family: inherit;
@@ -306,7 +306,7 @@ display: none !important;
 <button type="button" class="btn-calc" onclick="calculate()">Calculate</button>
 
 <div id="resultContainer" aria-live="polite" aria-atomic="true">
-<h3 id="resultLabel">Result</h3>
+<h2 id="resultLabel">Result</h2>
 <div id="resultValue">--</div>
 </div>
 </div>
